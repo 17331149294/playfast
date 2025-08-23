@@ -1,0 +1,418 @@
+/* 主要变量设置 */
+:root {
+  --primary-color: #8a2be2;     /* 主色调：紫色 */
+  --secondary-color: #0fe0ff;   /* 辅助色：青色 */
+  --accent-color: #ff3e6f;      /* 强调色：红色 */
+  --dark-color: #121212;        /* 深色背景 */
+  --dark-color-lighter: #1a1a2e; /* 稍浅的深色背景 */
+  --text-color: #f9f9f9;        /* 文字颜色 */
+  --text-dark: #333333;         /* 深色文字 */
+  --transition-speed: 0.3s;     /* 过渡动画速度 */
+  --glow-effect: 0 0 10px rgba(138, 43, 226, 0.8), 0 0 20px rgba(138, 43, 226, 0.5);
+  --border-glow: 0 0 5px rgba(14, 224, 255, 0.5);
+}
+
+/* 全局重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Rajdhani', 'Roboto', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--dark-color);
+  color: var(--text-color);
+}
+
+/* 应用容器 */
+#App {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(135deg, rgba(18, 18, 18, 0.9), rgba(26, 26, 46, 0.9));
+  overflow: hidden;
+}
+
+/* 粒子背景效果 */
+#particles-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* 主界面布局 */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* 顶部区域 */
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Logo区域 */
+.logo-area {
+  display: flex;
+  align-items: center;
+}
+
+.logo-area h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(14, 224, 255, 0.3);
+}
+
+.logo-area .highlight {
+  color: var(--secondary-color);
+  position: relative;
+  display: inline-block;
+}
+
+/* 控制面板 */
+#RightBox {
+  width: 220px;
+  backdrop-filter: blur(10px);
+  background: rgba(26, 26, 46, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  box-shadow: var(--border-glow);
+  padding: 12px;
+  margin-left: 330px;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#RightBox:hover {
+  box-shadow: 0 0 15px rgba(14, 224, 255, 0.7);
+}
+
+/* 控制面板标题 */
+#RightBox h2 {
+  color: var(--secondary-color);
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  text-shadow: var(--glow-effect);
+  text-align: center;
+}
+
+#RightBox h2:after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+}
+
+/* 状态指示器 */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background-color: #666;
+}
+
+.indicator-dot.active {
+  background-color: #4fff91;
+  box-shadow: 0 0 10px #4fff91;
+  animation: pulse 1.5s infinite;
+}
+
+.indicator-text {
+  font-size: 0.8rem;
+  color: var(--text-color);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 255, 145, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(79, 255, 145, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 255, 145, 0); }
+}
+
+/* 网络状态展示面板 */
+.network-stats {
+  background: rgba(18, 18, 18, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  padding: 10px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.versus {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 5px;
+  color: var(--secondary-color);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #b8b8b8;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+/* 底部控制区域 */
+#Bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#Bottom > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+#Bottom label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-right: 8px;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-block;
+  padding: 8px 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 50px;
+  background: linear-gradient(45deg, var(--primary-color), #6a0dad);
+  color: var(--text-color);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  margin-top: 5px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn.accelerated {
+  background: linear-gradient(45deg, var(--accent-color), #ff7f50);
+}
+
+/* 加载状态 */
+.btn.loading {
+  background: linear-gradient(45deg, var(--primary-color), #6a0dad);
+  animation: gradientShift 1.5s ease infinite;
+  position: relative;
+}
+
+.btn.loading::before {
+  content: "加速中";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--text-color);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 10px var(--primary-color);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 20px var(--secondary-color);
+  }
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 10px var(--primary-color);
+  }
+}
+
+/* 移除旧的旋转动画 */
+.btn.loading::after {
+  display: none;
+}
+
+/* 下拉选择样式 */
+select {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+  background-color: rgba(18, 18, 18, 0.8);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230fe0ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: var(--border-glow);
+}
+
+select:hover {
+  border-color: var(--secondary-color);
+}
+
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: rgba(18, 18, 18, 0.5);
+  border-color: rgba(138, 43, 226, 0.1);
+}
+
+select:disabled:hover {
+  border-color: rgba(138, 43, 226, 0.1);
+  box-shadow: none;
+}
+
+/* 版本信息和底部标签 */
+.version-info {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: #b8b8b8;
+  opacity: 0.7;
+  z-index: 10;
+}
+
+.host-mode-toggle {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.host-mode-toggle label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+}
+
+.host-mode-toggle input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #8a2be2;
+}
+
+/* 禁用状态样式 */
+.host-mode-toggle input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.host-mode-toggle input[type="checkbox"]:disabled + span {
+    color: #aaa;
+    cursor: not-allowed;
+}
