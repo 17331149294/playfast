@@ -7,7 +7,7 @@ import (
 
 func TestBox(t *testing.T) {
 	box := New(context.Background())
-	err := box.Start("kr", false)
+	err := box.Start("韩国1", false)
 	if err != nil {
 		t.Error(err)
 	}

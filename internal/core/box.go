@@ -198,11 +198,6 @@ func (b *Box) newBox(proxy string) error {
 		default:
 			continue
 		}
-		if p.Name == proxy {
-			proxyOutbound = &out
-			proxyOutboundIP = p.Host
-			continue
-		}
 		registryOut := include.OutboundRegistry()
 		createOutbound, err2 := registryOut.CreateOutbound(context.Background(), nil, slog.StdLogger(), out.Type, out.Type, out.Options)
 		if err2 != nil {
@@ -215,13 +210,13 @@ func (b *Box) newBox(proxy string) error {
 		}
 		var ms int64
 		result := client.Test(b.ctx, []byte("GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nAccept: *\r\n\r\n\r\n"))
-		if result.Success {
-			ms = result.Latency.Milliseconds()
-		}
+		ms = result.Latency.Milliseconds()
 		log.Println(fmt.Sprintf("节点选择:ID:%d 节点:%s 延迟=%dms\n", i, p.Name, ms))
 		if ms <= 0 {
 			return errors.New("节点超时")
 		}
+		proxyOutbound = &out
+		proxyOutboundIP = p.Host
 	}
 	if proxyOutbound == nil {
 		return errors.New("not fount Outbound")
