@@ -2,16 +2,13 @@ package core
 
 import (
 	"PlayFast/internal/api"
-	"PlayFast/internal/echo"
-	"PlayFast/internal/http-client"
+	http_client "PlayFast/internal/http-client"
 	"PlayFast/internal/node"
 	"PlayFast/internal/path"
 	"PlayFast/utils"
 	"context"
 	_ "embed"
-	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/netip"
 	"os"
@@ -96,132 +93,60 @@ func (b *Box) Stop() error {
 func New(ctx context.Context) *Box {
 	ctx = service.ContextWith(ctx, deprecated.NewStderrManager(slog.StdLogger()))
 	ctx = box.Context(ctx, include.InboundRegistry(), include.OutboundRegistry(), include.EndpointRegistry(), include.DNSTransportRegistry())
+	_ = os.WriteFile(filepath.Join(path.Path(), "black-list.json"), black, 0644)
+	_ = os.WriteFile(filepath.Join(path.Path(), "direct-list.json"), direct, 0644)
+	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.json"), geoipJson, 0644)
+	_ = os.WriteFile(filepath.Join(path.Path(), "geosite-cn.srs"), geosite, 0644)
+	b := Box{
+		ctx:     ctx,
+		appends: []string{},
+	}
+	go b.update()
+	return &b
+}
+func (b *Box) update() {
 	var data []byte
 	data, err := http_client.GET(fmt.Sprintf("%s/black-list.json", api.GetApiDomain()))
 	if err != nil {
 		data = black
 	}
+	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "black-list.json"), data, 0644)
-
+	b.Unlock()
 	data, err = http_client.GET(fmt.Sprintf("%s/direct-list.json", api.GetApiDomain()))
 	if err != nil {
 		data = direct
 	}
+	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "direct-list.json"), data, 0644)
-
+	b.Unlock()
 	data, err = http_client.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geoip/geoip-cn.json")
 	if err != nil {
 		data = geoipJson
 	}
+	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.json"), data, 0644)
-
+	b.Unlock()
 	data, err = http_client.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geosite/geosite-cn.srs")
 	if err != nil {
 		data = geosite
 	}
+	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "geosite-cn.srs"), data, 0644)
-	return &Box{
-		ctx: ctx,
-	}
+	b.Unlock()
 }
 
 func (b *Box) newBox(proxy string) error {
-	data := node.Get()
-	var localResolutionDomainName []string
-	var proxyOutbound *option.Outbound
-	var proxyOutboundIP string
+	proxyOutbound, proxyOutboundHost, err := node.GetOutbound(proxy)
+	if err != nil {
+		return err
+	}
 	b.appends = make([]string, 0)
-	for i, p := range data {
-		switch {
-		case p.Name == proxy:
-			localResolutionDomainName = append(localResolutionDomainName, p.Host)
-		default:
-			continue
-		}
-		var out option.Outbound
-		switch p.Protocol {
-		case "shadowsocks":
-			out = option.Outbound{
-				Type: constant.TypeShadowsocks,
-				Tag:  "proxy",
-				Options: &option.ShadowsocksOutboundOptions{
-					ServerOptions: option.ServerOptions{
-						Server:     p.Host,
-						ServerPort: p.Port,
-					},
-					Method:   p.Method,
-					Password: p.Password,
-					UDPOverTCP: &option.UDPOverTCPOptions{
-						Enabled: true,
-						Version: 2,
-					},
-				},
-			}
-		case "vless":
-			out = option.Outbound{
-				Type: constant.TypeVLESS,
-				Tag:  "proxy",
-				Options: &option.VLESSOutboundOptions{
-					ServerOptions: option.ServerOptions{
-						Server:     p.Host,
-						ServerPort: p.Port,
-					},
-					UUID:                        p.Password,
-					OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{},
-					Multiplex: &option.OutboundMultiplexOptions{
-						Enabled:        true,
-						Protocol:       "h2mux",
-						MaxConnections: 8,
-						MinStreams:     16,
-						Padding:        false,
-					},
-				},
-			}
-		case "socks":
-			out = option.Outbound{
-				Type: constant.TypeSOCKS,
-				Tag:  "proxy",
-				Options: &option.SOCKSOutboundOptions{
-					ServerOptions: option.ServerOptions{
-						Server:     p.Host,
-						ServerPort: p.Port,
-					},
-					Version:  "5",
-					Username: "playfast",
-					Password: p.Password,
-					UDPOverTCP: &option.UDPOverTCPOptions{
-						Enabled: true,
-						Version: 2,
-					},
-				},
-			}
-		default:
-			continue
-		}
-		registryOut := include.OutboundRegistry()
-		createOutbound, err2 := registryOut.CreateOutbound(context.Background(), nil, slog.StdLogger(), out.Type, out.Type, out.Options)
-		if err2 != nil {
-			continue
-		}
-		client := echo.NewClient("1.1.1.1:80", echo.WithTimeout(3*time.Second), echo.WithDialer(createOutbound.DialContext))
-		err := client.Connect(b.ctx)
-		if err != nil {
-			continue
-		}
-		var ms int64
-		result := client.Test(b.ctx, []byte("GET / HTTP/1.1\r\nHost: 1.1.1.1\r\nAccept: *\r\n\r\n\r\n"))
-		ms = result.Latency.Milliseconds()
-		log.Println(fmt.Sprintf("节点选择:ID:%d 节点:%s 延迟=%dms\n", i, p.Name, ms))
-		if ms <= 0 {
-			return errors.New("节点超时")
-		}
-		proxyOutbound = &out
-		proxyOutboundIP = p.Host
+	proxyOutboundIp, err := utils.GetIPsFromString(proxyOutboundHost)
+	if err != nil {
+		return err
 	}
-	if proxyOutbound == nil {
-		return errors.New("not fount Outbound")
-	}
-	b.appends = append(b.appends, fmt.Sprintf("%s/32", proxyOutboundIP))
+	b.appends = append(b.appends, fmt.Sprintf("%s/32", proxyOutboundIp))
 	options := box.Options{
 		Options: option.Options{
 			Log: &option.LogOptions{
@@ -285,7 +210,7 @@ func (b *Box) newBox(proxy string) error {
 							Type: constant.RuleTypeDefault,
 							DefaultOptions: option.DefaultDNSRule{
 								RawDefaultDNSRule: option.RawDefaultDNSRule{
-									Domain: localResolutionDomainName,
+									Domain: []string{proxyOutboundHost},
 								},
 								DNSRuleAction: option.DNSRuleAction{
 									Action: constant.RuleActionTypeRoute,
@@ -478,7 +403,6 @@ func (b *Box) newBox(proxy string) error {
 		Timestamp:    true,
 		DisableColor: true,
 	}
-	var err error
 	b.box, err = box.New(options)
 	return err
 }

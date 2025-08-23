@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/netip"
 	"os/exec"
 	"syscall"
@@ -101,4 +102,16 @@ func DeleteRoute(destination, mask, gateway netip.Addr, metric, ifIndex int) err
 		ForwardMetric5:   0,
 	})
 	return err
+}
+func GetIPsFromString(input string) (string, error) {
+	// 首先检查是否是有效的 IP 地址
+	if ip := net.ParseIP(input); ip != nil {
+		return ip.String(), nil
+	}
+	// 如果不是 IP，尝试作为域名解析
+	addr, err := net.LookupHost(input)
+	if err != nil {
+		return "", fmt.Errorf("无法解析 %s: %v", input, err)
+	}
+	return addr[0], nil
 }
