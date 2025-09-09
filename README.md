@@ -73,6 +73,7 @@ PlayFast 是一个专为游戏优化的网络加速工具，基于强大的 sing
   {
     "name": "香港节点1",
     "protocol": "shadowsocks",
+    "method": "ase-256-gcm",
     "password": "your_password",
     "host": "1.2.3.4",
     "port": 1234
