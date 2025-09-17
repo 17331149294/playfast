@@ -1,12 +1,11 @@
 package main
 
 import (
-	"PlayFast/internal/eve"
-	"PlayFast/internal/path"
 	"embed"
 	"log"
 	"net"
 	"os"
+	"playfast/internal/path"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -22,7 +21,6 @@ var logo []byte
 var Version = "1.0.0"
 
 func main() {
-	eve.Elevate()
 	dial, err := net.Dial("tcp", "127.0.0.1:54712")
 	if err == nil {
 		_, _ = dial.Write([]byte("SHOW_WINDOW"))

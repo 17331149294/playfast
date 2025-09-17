@@ -11,8 +11,7 @@ PlayFast 是一个专为游戏优化的网络加速工具，基于强大的 sing
 
 ## 特性
 
-- ✅ **多平台支持**：Windows / macOS / Linux
-- 🎮 **主机游戏加速**：支持 PlayStation、Xbox、Switch 等主机（仅 Windows）
+- 🎮 **主机游戏加速**：支持 PlayStation、Xbox、Switch 等主机
 - ⚙️ **自定义配置**：支持自定义节点和规则配置
 - 🚀 **高性能内核**：基于 sing-box 核心，性能稳定
 - 💻 **现代界面**：基于 Wails 框架的原生 GUI

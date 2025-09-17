@@ -1,14 +1,14 @@
 package node
 
 import (
-	"PlayFast/internal/api"
-	"PlayFast/internal/echo"
-	"PlayFast/internal/http-client"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"playfast/internal/api"
+	"playfast/internal/echo"
+	"playfast/internal/http-client"
 	"time"
 
 	"github.com/sagernet/sing-box/constant"

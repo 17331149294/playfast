@@ -1,11 +1,11 @@
 package core
 
 import (
-	"PlayFast/utils"
 	"encoding/json"
 	"log"
 	"net"
 	"net/netip"
+	"playfast/utils"
 
 	"github.com/sagernet/sing/common/json/badoption"
 )

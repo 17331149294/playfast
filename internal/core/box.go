@@ -1,11 +1,6 @@
 package core
 
 import (
-	"PlayFast/internal/api"
-	http_client "PlayFast/internal/http-client"
-	"PlayFast/internal/node"
-	"PlayFast/internal/path"
-	"PlayFast/utils"
 	"context"
 	_ "embed"
 	"fmt"
@@ -13,6 +8,11 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"playfast/internal/api"
+	httpclient "playfast/internal/http-client"
+	"playfast/internal/node"
+	"playfast/internal/path"
+	"playfast/utils"
 	"sync"
 	"time"
 
@@ -106,28 +106,28 @@ func New(ctx context.Context) *Box {
 }
 func (b *Box) update() {
 	var data []byte
-	data, err := http_client.GET(fmt.Sprintf("%s/black-list.json", api.GetApiDomain()))
+	data, err := httpclient.GET(fmt.Sprintf("%s/black-list.json", api.GetApiDomain()))
 	if err != nil {
 		data = black
 	}
 	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "black-list.json"), data, 0644)
 	b.Unlock()
-	data, err = http_client.GET(fmt.Sprintf("%s/direct-list.json", api.GetApiDomain()))
+	data, err = httpclient.GET(fmt.Sprintf("%s/direct-list.json", api.GetApiDomain()))
 	if err != nil {
 		data = direct
 	}
 	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "direct-list.json"), data, 0644)
 	b.Unlock()
-	data, err = http_client.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geoip/geoip-cn.json")
+	data, err = httpclient.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geoip/geoip-cn.json")
 	if err != nil {
 		data = geoipJson
 	}
 	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.json"), data, 0644)
 	b.Unlock()
-	data, err = http_client.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geosite/geosite-cn.srs")
+	data, err = httpclient.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geosite/geosite-cn.srs")
 	if err != nil {
 		data = geosite
 	}

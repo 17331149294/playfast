@@ -3,13 +3,14 @@ package echo
 import (
 	"context"
 	"fmt"
-	"github.com/sagernet/sing/common/metadata"
 	"io"
 	"math"
 	"net"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/sagernet/sing/common/metadata"
 )
 
 // Client 表示TCP Echo客户端

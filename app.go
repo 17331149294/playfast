@@ -1,13 +1,6 @@
 package main
 
 import (
-	"PlayFast/internal/api"
-	"PlayFast/internal/core"
-	"PlayFast/internal/dialog"
-	"PlayFast/internal/http-client"
-	"PlayFast/internal/node"
-	"PlayFast/internal/systray"
-	"PlayFast/utils"
 	"bytes"
 	"context"
 	"encoding/hex"
@@ -15,6 +8,13 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"playfast/internal/api"
+	"playfast/internal/core"
+	"playfast/internal/dialog"
+	"playfast/internal/http-client"
+	"playfast/internal/node"
+	"playfast/internal/systray"
+	"playfast/utils"
 	"sync/atomic"
 	"time"
 
