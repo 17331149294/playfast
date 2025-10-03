@@ -118,7 +118,7 @@ func GetOutbound(proxy string) (*option.Outbound, string, error) {
 		if ms <= 0 {
 			return nil, "", errors.New("节点超时")
 		}
-		return &out, p.Name, nil
+		return &out, p.Host, nil
 	}
 	return nil, "", errors.New("not fount Outbound")
 }
