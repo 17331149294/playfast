@@ -38,12 +38,9 @@ PlayFast 是一个专为游戏优化的网络加速工具，基于强大的 sing
    ```
 
 3. **构建应用**
-   ```bash
+   ```cmd
    # Windows
    ./build.bat
-   
-   # Linux/macOS
-   ./build.sh
    ```
 
 ### 🌐 后端部署
@@ -94,9 +91,7 @@ PlayFast 是一个专为游戏优化的网络加速工具，基于强大的 sing
 {
   "version": "v1.0.0",
   "url_windows": "https://api.example.com/PlayFast.exe",
-  "sha256_windows": "66e2d9ca30a774061f3d9860757bb46799a2a8126b33c00db3a33546434c2248",
-  "url_darwin": "https://api.example.com/PlayFast.app", 
-  "sha256_darwin": "0b446a7eb49b824cea88efeae89db559fda88fe5e84743099b40b5098d3ae246s"
+  "sha256_windows": "66e2d9ca30a774061f3d9860757bb46799a2a8126b33c00db3a33546434c2248"
 }
 ```
 
