@@ -27,8 +27,8 @@ import (
 	"github.com/sagernet/sing/service"
 )
 
-//go:embed geoip-cn.json
-var geoipJson []byte
+//go:embed geoip-cn.srs
+var geoip []byte
 
 //go:embed geosite-cn.srs
 var geosite []byte
@@ -92,10 +92,10 @@ func (b *Box) Stop() error {
 }
 func New(ctx context.Context) *Box {
 	ctx = service.ContextWith(ctx, deprecated.NewStderrManager(slog.StdLogger()))
-	ctx = box.Context(ctx, include.InboundRegistry(), include.OutboundRegistry(), include.EndpointRegistry(), include.DNSTransportRegistry())
+	ctx = box.Context(ctx, include.InboundRegistry(), include.OutboundRegistry(), include.EndpointRegistry(), include.DNSTransportRegistry(), include.ServiceRegistry())
 	_ = os.WriteFile(filepath.Join(path.Path(), "black-list.json"), black, 0644)
 	_ = os.WriteFile(filepath.Join(path.Path(), "direct-list.json"), direct, 0644)
-	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.json"), geoipJson, 0644)
+	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.srs"), geoip, 0644)
 	_ = os.WriteFile(filepath.Join(path.Path(), "geosite-cn.srs"), geosite, 0644)
 	b := Box{
 		ctx:     ctx,
@@ -120,12 +120,12 @@ func (b *Box) update() {
 	b.Lock()
 	_ = os.WriteFile(filepath.Join(path.Path(), "direct-list.json"), data, 0644)
 	b.Unlock()
-	data, err = httpclient.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geoip/geoip-cn.json")
+	data, err = httpclient.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geoip/geoip-cn.srs")
 	if err != nil {
-		data = geoipJson
+		data = geoip
 	}
 	b.Lock()
-	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.json"), data, 0644)
+	_ = os.WriteFile(filepath.Join(path.Path(), "geoip-cn.srs"), data, 0644)
 	b.Unlock()
 	data, err = httpclient.GET("https://raw.githubusercontent.com/lyc8503/sing-box-rules/refs/heads/rule-set-geosite/geosite-cn.srs")
 	if err != nil {

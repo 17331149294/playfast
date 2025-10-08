@@ -1,28 +1,32 @@
 package core
 
 import (
-	"encoding/json"
+	"bytes"
 	"log"
 	"net"
 	"net/netip"
 	"playfast/utils"
 
+	"github.com/sagernet/sing-box/common/srs"
 	"github.com/sagernet/sing/common/json/badoption"
 )
 
-type rules struct {
-	Rules []struct {
-		IpCidr []string `json:"ip_cidr"`
-	} `json:"rules"`
-}
-
 func routeIps(appends []string) badoption.Listable[netip.Prefix] {
-	r := &rules{}
 	prefixes := make([]netip.Prefix, 0)
-	_ = json.Unmarshal(geoipJson, r)
-	for _, rule := range r.Rules {
-		for _, s := range rule.IpCidr {
-			prefixes = append(prefixes, netip.MustParsePrefix(s))
+	read, err := srs.Read(bytes.NewBuffer(geoip), false)
+	if err != nil {
+		return prefixes
+	}
+	for _, rule := range read.Options.Rules {
+		if rule.DefaultOptions.IPSet != nil {
+			for _, ipRange := range rule.DefaultOptions.IPSet.Ranges() {
+				for _, prefix := range ipRange.Prefixes() {
+					if !prefix.Addr().Is4() {
+						continue
+					}
+					prefixes = append(prefixes, prefix)
+				}
+			}
 		}
 	}
 	for _, s := range appends {
